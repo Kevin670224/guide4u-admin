@@ -1,18 +1,17 @@
-# routes/quote.py
-
 from flask import Blueprint, render_template, request, redirect
 from datetime import datetime
 from models import db, Quote  # Quote 모델이 models.py에 있어야 합니다
 
-quote_bp = Blueprint('quote', __name__)
+# ✅ URL prefix 추가
+quote_bp = Blueprint('quote', __name__, url_prefix="/quote")
 
 # 1. 견적 요청 폼 보여주기 (주소: /quote)
-@quote_bp.route("/quote")
+@quote_bp.route("/")
 def show_quote_form():
     return render_template("quote_form.html")
 
 # 2. 견적 저장 처리 (POST 처리 주소: /quote/submit)
-@quote_bp.route("/quote/submit", methods=["POST"])
+@quote_bp.route("/submit", methods=["POST"])
 def submit_quote():
     # 1. 견적번호 자동 생성 (예: Q20250521-001)
     today_str = datetime.today().strftime("%Y%m%d")
@@ -42,4 +41,4 @@ def submit_quote():
     db.session.commit()
 
     # 4. 완료 메시지 or 완료 페이지로 리디렉션
-    return redirect("/quote")  # 추후 '감사합니다' 페이지로 바꿔도 됩니다
+    return redirect("/quote")
