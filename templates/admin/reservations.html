@@ -1,0 +1,186 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}예약 목록{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='flatpickr/flatpickr.min.css') }}">
+
+<style>
+  .flatpickr-calendar.inline,
+  .flatpickr-calendar.open {
+    width: auto !important;
+  }
+
+  .flatpickr-calendar .flatpickr-months {
+    display: flex !important;
+    justify-content: space-between;
+  }
+
+  .flatpickr-calendar .flatpickr-innerContainer {
+    display: flex !important;
+  }
+
+  .flatpickr-calendar .flatpickr-rContainer {
+    display: block !important;
+  }
+</style>
+
+<div class="container mt-4">
+  <h2 class="mb-2">예약 관리 페이지</h2>
+  <p class="mb-4 text-muted">검색 결과: <strong>{{ total_count }}</strong>건</p>
+
+  <div class="mb-3 d-flex justify-content-between">
+    <div>
+      <form method="get" action="{{ url_for('admin_reservation.admin_reservations') }}" class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">검색</button>
+        <a href="{{ url_for('admin_reservation.admin_reservations') }}" class="btn btn-secondary">초기화</a>
+      </form>
+    </div>
+
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-primary" href="/admin/reservation/create">
+        ➕ 예약 추가
+      </a>
+      <a class="btn btn-success"
+         href="{{ url_for('admin_reservation.download_reservations_excel',
+              customer_name=customer_name, reservation_code=reservation_code,
+              departure_date=departure_date, date_range=date_range,
+              destination=destination, status=status) }}">
+        📥 엑셀 다운로드
+      </a>
+    </div>
+  </div>
+
+  <form class="row g-3 mb-4" method="get">
+    <div class="col-md-2">
+      <label for="departureDate" class="form-label">출발일</label>
+      <input type="text" class="form-control" id="departureDate" name="departure_date" placeholder="YYYY-MM-DD" value="{{ departure_date }}">
+    </div>
+    <div class="col-md-3">
+      <label for="dateRange" class="form-label">출발 ~ 귀국일</label>
+      <input type="text" class="form-control" id="dateRange" name="date_range" placeholder="날짜 범위 선택" value="{{ date_range }}">
+    </div>
+    <div class="col-md-2">
+      <label for="customerName" class="form-label">고객명</label>
+      <input type="text" class="form-control" id="customerName" name="customer_name" placeholder="예: 김철수" value="{{ customer_name }}">
+    </div>
+    <div class="col-md-2">
+      <label for="reservationCode" class="form-label">예약번호</label>
+      <input type="text" class="form-control" id="reservationCode" name="reservation_code" value="{{ reservation_code }}">
+    </div>
+    <div class="col-md-2">
+      <label for="destination" class="form-label">여행지</label>
+      <input type="text" class="form-control" id="destination" name="destination" placeholder="예: 태국/푸켓" value="{{ destination }}">
+    </div>
+    <div class="col-md-2">
+      <label for="status" class="form-label">상태</label>
+      <select class="form-select" id="status" name="status">
+        <option value="">전체</option>
+        <option value="confirmed" {% if status == 'confirmed' %}selected{% endif %}>확정</option>
+        <option value="pending" {% if status == 'pending' %}selected{% endif %}>대기</option>
+        <option value="cancelled" {% if status == 'cancelled' %}selected{% endif %}>취소</option>
+      </select>
+    </div>
+  </form>
+
+  <table class="table table-hover table-bordered text-center align-middle">
+    <thead class="table-light">
+      <tr>
+        <th>견적번호</th>
+        <th>예약일</th>
+        <th>예약번호</th>
+        <th>고객명</th>
+        <th>여행지</th>
+        <th>상품명</th>
+        <th>여행기간</th>
+        <th>인원</th>
+        <th>항공 정보</th>
+        <th>리조트 정보</th>
+        <th>상태</th>
+        <th>상세보기</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for res in reservations %}
+      <tr>
+        <td>{{ res.quote_no }}</td>
+        <td>{{ res.created_at.strftime('%Y-%m-%d') }}</td>
+        <td>{{ res.reservation_no }}</td>
+        <td>{{ res.customer_name }}</td>
+        <td>{{ res.destination }}</td>
+        <td>{{ res.product_name }}</td>
+        <td>{{ res.departure_date }} ~ {{ res.return_date }}</td>
+        <td>{{ res.total_people }}명<br>(성인: {{ res.adult }}, 아동: {{ res.child }}, 유아: {{ res.infant }})</td>
+        <td>{{ res.flight_status }}<br>{{ res.departure_time }} ~ {{ res.return_time }}</td>
+        <td>{{ res.resort_status }}<br>{{ res.resort_styles }}<br>{{ res.resort_name }}</td>
+        <td>
+          {% if res.status == 'confirmed' %}
+            <span class="badge rounded-pill bg-success px-3 py-2">확정</span>
+          {% elif res.status == 'pending' %}
+            <span class="badge rounded-pill bg-warning text-dark border border-dark px-3 py-2">대기</span>
+          {% elif res.status == 'cancelled' %}
+            <span class="badge rounded-pill bg-danger px-3 py-2">취소</span>
+          {% endif %}
+        </td>
+        <td><a href="/admin/reservation/{{ res.id }}" class="btn btn-sm btn-primary">상세보기</a></td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="12">검색 결과가 없습니다.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if pagination.pages > 1 %}
+  <nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center mt-4">
+      {% if pagination.has_prev %}
+      <li class="page-item">
+        <a class="page-link" href="{{ url_for('admin_reservation.admin_reservations', page=pagination.prev_num,
+          customer_name=customer_name, reservation_code=reservation_code, departure_date=departure_date,
+          date_range=date_range, destination=destination, status=status) }}">이전</a>
+      </li>
+      {% else %}
+      <li class="page-item disabled"><span class="page-link">이전</span></li>
+      {% endif %}
+
+      {% for p in range(1, pagination.pages + 1) %}
+      <li class="page-item {% if p == pagination.page %}active{% endif %}">
+        <a class="page-link" href="{{ url_for('admin_reservation.admin_reservations', page=p,
+          customer_name=customer_name, reservation_code=reservation_code, departure_date=departure_date,
+          date_range=date_range, destination=destination, status=status) }}">{{ p }}</a>
+      </li>
+      {% endfor %}
+
+      {% if pagination.has_next %}
+      <li class="page-item">
+        <a class="page-link" href="{{ url_for('admin_reservation.admin_reservations', page=pagination.next_num,
+          customer_name=customer_name, reservation_code=reservation_code, departure_date=departure_date,
+          date_range=date_range, destination=destination, status=status) }}">다음</a>
+      </li>
+      {% else %}
+      <li class="page-item disabled"><span class="page-link">다음</span></li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
+</div>
+
+<script src="{{ url_for('static', filename='flatpickr/flatpickr.min.js') }}"></script>
+<script src="{{ url_for('static', filename='flatpickr/l10n/ko.js') }}"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    flatpickr("#departureDate", {
+      dateFormat: "Y-m-d",
+      locale: "ko"
+    });
+    flatpickr("#dateRange", {
+      mode: "range",
+      dateFormat: "Y-m-d",
+      locale: "ko",
+      showMonths: 2
+    });
+  });
+</script>
+{% endblock %}

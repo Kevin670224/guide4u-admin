@@ -1,0 +1,295 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}예약 등록{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>예약 등록 폼</h2>
+
+  {% if success %}
+    <div class="alert alert-success">✅ 예약이 성공적으로 등록되었습니다!</div>
+  {% endif %}
+
+  <form method="POST" action="/admin/reservation/create">
+    <!-- 대표 고객명 -->
+    <div class="mb-3">
+      <label for="customer_name" class="form-label">대표 고객명 *</label>
+      <input type="text" class="form-control" id="customer_name" name="customer_name" required>
+    </div>
+
+    <!-- 전화번호 -->
+    <div class="mb-3">
+      <label for="phone" class="form-label">전화번호</label>
+      <input type="text" class="form-control" id="phone" name="phone" oninput="formatPhoneNumber(this)">
+    </div>
+
+    <!-- 여행지 -->
+    <div class="mb-3">
+      <label class="form-label">여행지</label>
+      <div class="row mb-2">
+        <div class="col-md-3">
+          <select class="form-select" id="country" name="country">
+            <option value="">국가 선택</option>
+            <option value="태국">태국</option>
+            <option value="베트남">베트남</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <select class="form-select" id="region" name="region" disabled>
+            <option value="">지역 선택</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <select class="form-select" id="product" name="product" disabled>
+            <option value="">상품 선택</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <input type="text" class="form-control" id="custom_destination" name="destination" placeholder="직접 입력">
+        </div>
+      </div>
+    </div>
+
+    <!-- 여행기간 -->
+    <div class="mb-3">
+      <label class="form-label">여행기간 *</label>
+      <input type="text" class="form-control" id="date_range" name="date_range" required>
+    </div>
+
+    <!-- 총 인원 -->
+    <div class="mb-3">
+      <label class="form-label">총 인원 *</label>
+      <div class="row">
+        <div class="col">
+          <label>성인</label>
+          <div class="input-group">
+            <button class="btn btn-outline-secondary" type="button" onclick="changeCount('adult', -1)">-</button>
+            <input type="text" class="form-control text-center" id="adult" name="adult" value="2" readonly>
+            <button class="btn btn-outline-secondary" type="button" onclick="changeCount('adult', 1)">+</button>
+          </div>
+        </div>
+        <div class="col">
+          <label>아동</label>
+          <div class="input-group">
+            <button class="btn btn-outline-secondary" type="button" onclick="changeCount('child', -1)">-</button>
+            <input type="text" class="form-control text-center" id="child" name="child" value="0" readonly>
+            <button class="btn btn-outline-secondary" type="button" onclick="changeCount('child', 1)">+</button>
+          </div>
+        </div>
+        <div class="col">
+          <label>유아</label>
+          <div class="input-group">
+            <button class="btn btn-outline-secondary" type="button" onclick="changeCount('infant', -1)">-</button>
+            <input type="text" class="form-control text-center" id="infant" name="infant" value="0" readonly>
+            <button class="btn btn-outline-secondary" type="button" onclick="changeCount('infant', 1)">+</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">총 인원</label>
+      <input type="text" class="form-control text-center" id="total_person" readonly>
+    </div>
+
+    <!-- 항공 정보 -->
+    <div class="mb-4 mt-4">
+      <h5 class="mb-3">항공 정보</h5>
+
+      <div class="mb-3">
+        <label class="form-label">항공권 예약 상황</label>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="flight_status" id="flight_option1" value="가이드 추천" checked>
+          <label class="form-check-label" for="flight_option1">예약 전 (가이드 4U 추천)</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="flight_status" id="flight_option2" value="직접 예약">
+          <label class="form-check-label" for="flight_option2">예약 전 (직접 예약 예정)</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="flight_status" id="flight_option3" value="예약 완료">
+          <label class="form-check-label" for="flight_option3">예약 완료</label>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <label class="form-label">출국 날짜</label>
+          <input type="date" class="form-control" id="departure_date" name="departure_date">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">출국 시간</label>
+          <input type="time" class="form-control" name="departure_time">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <label class="form-label">귀국 날짜</label>
+          <input type="date" class="form-control" id="return_date" name="return_date">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">귀국 시간</label>
+          <input type="time" class="form-control" name="return_time">
+        </div>
+      </div>
+    </div>
+
+    <!-- 리조트 정보 -->
+    <div class="mb-4 mt-4">
+      <h5 class="mb-3">리조트 정보</h5>
+
+      <div class="mb-3">
+        <label class="form-label">리조트 예약 상태</label>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="resort_status" id="resort_option1" value="가이드 추천" checked>
+          <label class="form-check-label" for="resort_option1">예약 전 (가이드 4U 추천)</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="resort_status" id="resort_option2" value="직접 예약">
+          <label class="form-check-label" for="resort_option2">예약 전 (직접 예약 예정)</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="resort_status" id="resort_option3" value="예약 완료">
+          <label class="form-check-label" for="resort_option3">예약 완료</label>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">원하는 리조트 스타일</label>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="checkbox" id="style_5star" name="resort_styles" value="5성급">
+          <label class="form-check-label" for="style_5star">5성급</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="checkbox" id="style_4star" name="resort_styles" value="4성급">
+          <label class="form-check-label" for="style_4star">4성급</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="checkbox" id="style_poolvilla" name="resort_styles" value="풀빌라">
+          <label class="form-check-label" for="style_poolvilla">풀빌라</label>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="resort_name" class="form-label">선호 리조트명</label>
+        <input type="text" class="form-control" id="resort_name" name="resort_name" placeholder="예: 반얀트리 푸켓">
+      </div>
+
+      <div class="mb-3">
+        <label for="resort_request" class="form-label">기타 요청사항</label>
+        <textarea class="form-control" id="resort_request" name="resort_request" rows="3" placeholder="특별 요청이 있다면 입력해 주세요."></textarea>
+      </div>
+    </div>
+
+    <!-- 상태 -->
+    <div class="mb-3">
+      <label for="status" class="form-label">상태</label>
+      <select class="form-select" id="status" name="status">
+        <option value="예약요청">예약요청</option>
+        <option value="예약완료">예약완료</option>
+        <option value="취소됨">취소됨</option>
+      </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">등록하기</button>
+  </form>
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ko.js"></script>
+
+<script>
+  flatpickr("#date_range", {
+    mode: "range",
+    dateFormat: "Y-m-d",
+    locale: "ko",
+    showMonths: 2,
+    position: "auto left",
+    onChange: function(selectedDates, dateStr, instance) {
+      if (selectedDates.length === 2) {
+        const [departure, returnDate] = selectedDates;
+        const formatDate = (date) => date.toISOString().split("T")[0];
+        document.getElementById("departure_date").value = formatDate(departure);
+        document.getElementById("return_date").value = formatDate(returnDate);
+      }
+    }
+  });
+
+  function formatPhoneNumber(input) {
+    let num = input.value.replace(/\D/g, "");
+    if (num.length >= 11) {
+      input.value = num.replace(/(\d{3})(\d{4})(\d{4})/, "$1-$2-$3");
+    }
+  }
+
+  const countrySelect = document.getElementById("country");
+  const regionSelect = document.getElementById("region");
+  const productSelect = document.getElementById("product");
+
+  const data = {
+    "태국": {
+      "방콕": ["방콕 시티투어", "방콕 자유여행"],
+      "푸켓": ["푸켓 리조트 투어", "푸켓 커플 여행"]
+    },
+    "베트남": {
+      "다낭": ["다낭 시내투어", "다낭 가족여행"],
+      "호치민": ["호치민 시장투어", "호치민 역사탐방"]
+    }
+  };
+
+  countrySelect.addEventListener("change", () => {
+    const selected = countrySelect.value;
+    regionSelect.innerHTML = '<option value="">지역 선택</option>';
+    productSelect.innerHTML = '<option value="">상품 선택</option>';
+    regionSelect.disabled = true;
+    productSelect.disabled = true;
+
+    if (data[selected]) {
+      Object.keys(data[selected]).forEach(region => {
+        const opt = document.createElement("option");
+        opt.value = region;
+        opt.textContent = region;
+        regionSelect.appendChild(opt);
+      });
+      regionSelect.disabled = false;
+    }
+  });
+
+  regionSelect.addEventListener("change", () => {
+    const selectedCountry = countrySelect.value;
+    const selectedRegion = regionSelect.value;
+    productSelect.innerHTML = '<option value="">상품 선택</option>';
+    productSelect.disabled = true;
+
+    if (data[selectedCountry] && data[selectedCountry][selectedRegion]) {
+      data[selectedCountry][selectedRegion].forEach(product => {
+        const opt = document.createElement("option");
+        opt.value = product;
+        opt.textContent = product;
+        productSelect.appendChild(opt);
+      });
+      productSelect.disabled = false;
+    }
+  });
+
+  function changeCount(type, delta) {
+    const input = document.getElementById(type);
+    let value = parseInt(input.value) + delta;
+    if (value < 0) value = 0;
+    input.value = value;
+    updateTotalPerson();
+  }
+
+  function updateTotalPerson() {
+    const adult = parseInt(document.getElementById("adult").value);
+    const child = parseInt(document.getElementById("child").value);
+    const infant = parseInt(document.getElementById("infant").value);
+    const total = adult + child + infant;
+    document.getElementById("total_person").value = total;
+  }
+
+  window.onload = updateTotalPerson;
+</script>
+{% endblock %}

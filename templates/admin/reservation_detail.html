@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>예약 상세 정보</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    body {
+      font-size: 14px;
+      padding: 20px;
+      max-width: 95%;
+      margin: 0 auto;
+    }
+
+    h2 {
+      font-weight: bold;
+      margin: 30px 0 15px;
+      font-size: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    th, td {
+      border: 1px solid #dee2e6;
+      padding: 0.5rem;
+      vertical-align: middle;
+      text-align: left;
+    }
+
+    .section-divider {
+      border-top: 2px solid #000;
+      margin: 30px 0 15px;
+    }
+
+    .resort-section {
+      margin-top: 40px;
+    }
+
+    .resort-section table td,
+    .resort-section table th {
+      text-align: center !important;
+    }
+
+    .resort-name {
+      font-weight: bold;
+      font-size: 15px;
+      margin: 15px 0 8px;
+    }
+
+    .total-price {
+      font-weight: bold;
+      font-size: 15px;
+      background-color: #f8f9fa;
+    }
+
+    .btn-container {
+      margin-top: 15px;
+      text-align: center;
+    }
+
+    button {
+      font-size: 14px;
+      padding: 6px 16px;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 예약 정보 -->
+  <h2>예약 정보</h2>
+  <table>
+    <tr><th>예약번호</th><td>R001</td></tr>
+    <tr><th>견적서 번호</th><td>123456</td></tr>
+    <tr><th>대표 고객명</th><td>김철수</td></tr>
+    <tr><th>전화번호</th><td>010-1234-5678</td></tr>
+    <tr><th>총 인원</th><td>성인 2, 아동 1, 유아 1</td></tr>
+    <tr><th>계약일</th><td>2025-05-15</td></tr>
+    <tr><th>여행지</th><td>태국 > 푸켓</td></tr>
+    <tr><th>여행상품명</th><td>푸켓 자유여행 5박 6일</td></tr>
+    <tr><th>담당자</th><td>이현우</td></tr>
+    <tr><th>계약금 (₩)</th><td>₩500,000</td></tr>
+    <tr><th>투어잔금 ($)</th><td>$1,200</td></tr>
+    <tr><th>여행자 보험</th><td>가입 완료</td></tr>
+    <tr><th>출발일</th><td>2025-05-30 / KE005 (17:30 ~ 22:10)</td></tr>
+    <tr><th>귀국일</th><td>2025-06-02 / KE006 (23:30 ~ 07:25 + 1일)</td></tr>
+    <tr><th>담당 가이드</th><td>Mr. Sak</td></tr>
+    <tr><th>담당 차량</th><td>차량 2대 (벤)</td></tr>
+  </table>
+
+  <div class="section-divider"></div>
+
+  <!-- 리조트 정보 -->
+  <div class="resort-section">
+    <h2 style="text-align: left;">리조트 정보</h2>
+
+    <div class="resort-name">📍 리조트 1: 더 나카 리조트 (The Naka Resort)</div>
+    <table>
+      <tr>
+        <th>객실타입</th><th>객실수</th><th>엑스트라 베드 수</th><th>상태</th>
+        <th>박당 객실요금 ($)</th><th>박당 엑베 요금 ($)</th><th>박수</th><th>기타 추가요금 ($)</th><th>총 숙박요금 ($)</th>
+      </tr>
+      <tr>
+        <td>2 Bedroom Pool Villa</td><td>2</td><td>1</td><td>확정</td>
+        <td>$200</td><td>$50</td><td>5박</td><td>$100</td><td>$2,250</td>
+      </tr>
+    </table>
+
+    <div class="resort-name">📍 리조트 2: 메리엇 리조트 (Phuket Marriott)</div>
+    <table>
+      <tr>
+        <th>객실타입</th><th>객실수</th><th>엑스트라 베드 수</th><th>상태</th>
+        <th>박당 객실요금 ($)</th><th>박당 엑베 요금 ($)</th><th>박수</th><th>기타 추가요금 ($)</th><th>총 숙박요금 ($)</th>
+      </tr>
+      <tr>
+        <td>Deluxe Ocean View</td><td>1</td><td>0</td><td>확정</td>
+        <td>$180</td><td>$0</td><td>3박</td><td>$0</td><td>$540</td>
+      </tr>
+      <tr class="total-price">
+        <td colspan="8">총 리조트 숙박 요금 ($)</td><td>$2,790</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="btn-container">
+    <button class="btn btn-primary">일정표 보기</button>
+    <button class="btn btn-secondary">목록으로 돌아가기</button>
+  </div>
+
+</body>
+</html>
