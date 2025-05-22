@@ -2,9 +2,11 @@ services:
   - type: web
     name: guide4u-admin
     env: python
+    region: oregon
     plan: free
-    buildCommand: ""
-    startCommand: gunicorn wsgi:app
+    branch: main
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn main:app
     envVars:
       - key: FLASK_ENV
         value: production
