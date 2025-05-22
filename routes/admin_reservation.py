@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, send_file, redirect, url_
 from io import BytesIO
 from openpyxl import Workbook
 from datetime import datetime
-from app import db
+from models import db
 from models import Reservation
 
 admin_reservation_bp = Blueprint("admin_reservation", __name__, url_prefix="/admin")

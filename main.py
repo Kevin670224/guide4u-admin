@@ -29,7 +29,9 @@ def create_app():
 
     return app
 
-# ✅ 실제 실행부
+# ✅ gunicorn 이 인식할 수 있도록 app을 최상단에 선언
+app = create_app()
+
+# ✅ 로컬 실행용
 if __name__ == "__main__":
-    app = create_app()
     app.run(debug=True)
